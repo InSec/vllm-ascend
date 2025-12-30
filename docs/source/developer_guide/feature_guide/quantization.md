@@ -31,7 +31,6 @@ When loading the model, the quantized model's description file **quant_model_des
     "model.layers.0.mlp.experts.0.gate_proj.weight": "W8A8_DYNAMIC",
     "model.layers.0.mlp.experts.0.gate_proj.weight_scale": "W8A8_DYNAMIC",
     "model.layers.0.mlp.experts.0.gate_proj.weight_offset": "W8A8_DYNAMIC",
-    ......
 }
 ```
 
@@ -59,7 +58,7 @@ The `create_weight` method is used for weight initialization; the `process_weigh
 
 We need to implement the `create_weights`, `process_weights_after_loading`, and `apply` methods for different **layers** (**attention**, **mlp**, **moe**).
 
-### New Quantization Algorithm Adaptation
+### Quantization Algorithm Adaptation
 
 - **Step 1: Algorithm Design**. Define the algorithm ID (e.g., `W4A8_DYNAMIC`), determine supported types (linear, moe, attention), and design the quantization scheme (static/dynamic, pertensor/perchannel/pergroup).
 - **Step 2: Registration**. Add the algorithm ID to `ASCEND_QUANTIZATION_METHOD_MAP` in `vllm_ascend/quantization/utils.py` and associate it with the corresponding method class.
@@ -76,7 +75,7 @@ ASCEND_QUANTIZATION_METHOD_MAP: Dict[str, Dict[str, Type[Any]]] = {
 - **Step 3: Implementation**. Create an algorithm implementation file, such as `vllm_ascend/quantization/w4a8_dynamic.py`, and implement the method class and logic.
 - **Step 4: Testing**. Use your algorithm to generate quantization configurations and verify correctness and performance on target models and hardware.
 
-### New Quantized Model Adaptation
+### Quantized Model Adaptation
 
 Adapting a new quantized model requires ensuring the following three points:
 
