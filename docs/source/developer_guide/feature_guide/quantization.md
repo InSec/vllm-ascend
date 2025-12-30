@@ -8,7 +8,9 @@ This document provides guidance for adapting quantization algorithms and models.
 
 The current process for registering and obtaining quantization methods in vLLM Ascend is as follows:
 
-![get_quant_method](../../assets/quantization/get_quant_method.png)
+  <div style="text-align: center;">
+    <img src="../../assets/quantization/get_quant_method.png" alt="get_quant_method">
+  </div>
 
 vLLM Ascend registers a custom ascend quantization method. By configuring the `--quantization ascend` parameter (or `quantization="ascend"` for offline), the quantization feature is enabled. When constructing the `quant_config`, the registered `AscendQuantConfig` is initialized and `get_quant_method` is called to obtain the quantization method corresponding to each weight part, stored in the `quant_method` attribute.
 
@@ -35,17 +37,23 @@ When loading the model, the quantized model's description file **quant_model_des
 
 Currently supported quantization methods include `AscendLinearMethod`, `AscendFusedMoEMethod`, `AscendEmbeddingMethod`, and their corresponding non-quantized methods:
 
-![quant_methods_overview](../../assets/quantization/quant_methods_overview.png)
+  <div style="text-align: center;">
+    <img src="../../assets/quantization/quant_methods_overview.png" alt="quant_methods_overview">
+  </div>
 
 The quantization method base class defined by vLLM is:
 
-![quant_method_base_class](../../assets/quantization/quant_method_base_class.png)
+  <div style="text-align: center;">
+    <img src="../../assets/quantization/quant_method_base_class.png" alt="quant_method_base_class">
+  </div>
 
 The `embedding` method is generally not implemented for quantization, focusing only on the other three methods.
 
 The overall call flow of quantization methods is as follows:
 
-![quant_method_call_flow](../../assets/quantization/quant_method_call_flow.png)
+  <div style="text-align: center;">
+    <img src="../../assets/quantization/quant_method_call_flow.png" alt="quant_method_call_flow">
+  </div>
 
 The `create_weight` method is used for weight initialization; the `process_weights_after_loading` method is used for weight post-processing, such as transposition, format conversion, data type conversion, etc.; the `apply` method is used to perform activation quantization and quantized matrix multiplication calculations during the forward process.
 
@@ -99,7 +107,9 @@ packed_modules_model_mapping = {
 
 vLLM Ascend supports multiple quantization algorithms. The methods currently supported by each algorithm are shown in the following figure:
 
-![quant_algorithm_overview](../../assets/quantization/quant_algorithm_overview.png)
+  <div style="text-align: center;">
+    <img src="../../assets/quantization/quant_algorithm_overview.png" alt="quant_algorithm_overview">
+  </div>
 
 The following table provides an overview of each quantization algorithm based on the implementation in the `vllm_ascend.quantization` module:
 
@@ -112,8 +122,6 @@ The following table provides an overview of each quantization algorithm based on
 | `W4A8_DYNAMIC`            | INT4   | INT8       | Per-Group          | Per-Token              | Dynamic | Supports both direct per-channel quantization to 4-bit and two-step quantization (per-channel to 8-bit then per-group to 4-bit)                           |
 | `W4A4_FLATQUANT_DYNAMIC`  | INT4   | INT4       | Per-Channel        | Per-Token              | Dynamic | Uses FlatQuant for activation distribution smoothing before 4-bit dynamic quantization, with additional matrix multiplications for precision preservation |
 | `W8A8_MIX` / `W8A8_PDMIX` | INT8   | INT8       | Per-Channel        | Per-Tensor/Token       | Mixed   | PD co-location uses dynamic quantization for both P and D; PD separation uses dynamic quantization for P and static for D                                 |
-| `W4A16`                   | INT4   | FP16/BF16  | Per-Group          | -                      | Static  | INT4 weight precision with FP16/BF16 activation precision, specifically designed for MoE model expert layers                                              |
-| `W8A16`                   | INT8   | FP16/BF16  | Per-Channel        | -                      | Static  | INT8 weight precision with FP16/BF16 activation precision, suitable for linear layers                                                                     |
 
 **Static vs Dynamic:** Static quantization uses pre-computed scaling factors with better performance, while dynamic quantization computes scaling factors on-the-fly for each token/activation tensor with higher precision.
 
